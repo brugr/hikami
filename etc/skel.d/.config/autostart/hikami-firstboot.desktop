@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=hikami Desktop FirstBoot Setup
+Comment=Sets up hikami Desktop Correctly On FirstBoot
+Exec=/usr/bin/hikami-firstboot
+Icon=org.gnome.Terminal
+Type=Application
+Categories=Utility;System;
+Name[en_US]=startup

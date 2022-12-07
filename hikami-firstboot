@@ -1,0 +1,130 @@
+#!/bin/sh
+
+if test -e "$HOME"/.config/hikami/firstboot-done; then
+    echo "Already ran"
+    exit 0
+fi
+
+(
+echo "# Waiting for Internet connection"
+until /usr/bin/ping -q -c 1 flathub.org; do sleep 1; done
+echo "00"
+
+echo "# Removing Filtered Flathub Repository"
+/usr/bin/flatpak remote-delete flathub --force ||:
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Removing Filtered Flatpak Repo Failed"
+        exit 1
+fi
+echo "3"
+
+echo "# Enabling Flathub Repository"
+/usr/bin/flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Adding Flathub Repo Failed"
+        exit 1
+fi
+echo "5"
+
+echo "# Removing Fedora Flatpak Repository"
+/usr/bin/flatpak remote-delete fedora --force ||:
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Removing Fedora Flatpak Repo Failed"
+        exit 1
+fi
+echo "7"
+
+echo "# Installing LibreWolf"
+/usr/bin/flatpak install --user --noninteractive flathub io.gitlab.librewolf-community
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing LibreWolf Failed"
+        exit 1
+fi
+echo "15"
+
+echo "# Installing LibreOffice"
+/usr/bin/flatpak install --user --noninteractive flathub org.libreoffice.LibreOffice
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing LibreOffice Failed"
+        exit 1
+fi
+echo "30"
+
+
+echo "# Installing GNOME Applications"
+/usr/bin/flatpak install --user --noninteractive flathub \
+        org.gnome.Calculator \
+        org.gnome.Evince \
+        org.gnome.Logs 
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing GNOME Applications Failed"
+        exit 1
+fi
+echo "40"
+
+echo "# Installing more GNOME Applications"
+/usr/bin/flatpak install --user --noninteractive flathub \
+        org.gnome.NautilusPreviewer \
+        org.gnome.TextEditor \
+        org.gnome.Weather \
+        org.gnome.baobab \
+        org.gnome.eog \
+        org.gnome.FontManager
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing GNOME more Applications Failed"
+        exit 1
+fi
+echo "60"
+
+echo "# Installing Atoms"
+/usr/bin/flatpak install --user --noninteractive flathub pm.mirko.Atoms
+/usr/bin/flatpak override --user --talk-name=org.freedesktop.Flatpak pm.mirko.Atoms
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing Atoms Failed"
+        exit 1
+fi
+echo "70"
+
+echo "# Installing Extension Manager"
+/usr/bin/flatpak install --user --noninteractive flathub com.mattjakeman.ExtensionManager
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing Extension Manager Failed"
+        exit 1
+fi
+echo "80"
+
+echo "# Installing Flatseal"
+/usr/bin/flatpak install --user --noninteractive flathub com.github.tchx84.Flatseal
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing Flatseal Failed"
+        exit 1
+fi
+echo "90"
+
+echo "# Installing Celluloid Media Player"
+/usr/bin/flatpak install --user --noninteractive flathub io.github.celluloid_player.Celluloid
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Installing Celluloid Failed"
+        exit 1
+fi
+echo "100"
+
+echo "# Final small things"
+mkdir -p "$HOME"/.config/hikami/
+touch "$HOME"/.config/hikami/firstboot-done
+
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Firstboot Configuration Error"
+fi
