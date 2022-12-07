@@ -128,4 +128,10 @@ if [ "$?" != 0 ] ; then
         zenity --error \
           --text="Firstboot Configuration Error"
 fi
-)
+) |
+        zenity --progress --title="Hikami First Setup" --percentage=0 --auto-close --no-cancel --width=400
+
+if [ "$?" != 0 ] ; then
+        zenity --error \
+          --text="Firstboot Configuration Error"
+fi
