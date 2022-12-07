@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
 env:
-    IMAGE_NAME: hikami-image
+    IMAGE_NAME: hikami
     IMAGE_TAGS: latest ${{ github.sha }}
     IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
     REGISTRY_USER: ${{ github.actor }}

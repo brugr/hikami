@@ -128,3 +128,4 @@ if [ "$?" != 0 ] ; then
         zenity --error \
           --text="Firstboot Configuration Error"
 fi
+)
