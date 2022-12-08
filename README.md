@@ -5,6 +5,8 @@
 A custom image for use with Silverblue, based of [castrojo/ublue-image](https://github.com/castrojo/ublue-image).  
 It tries to be a pretty clean and vanilla install of GNOME with only a few smaller tweaks.
 
+You should check the [FAQ](#faq) for a notice as to why you probably shouldn't use this.
+
 # Usage
 
 WARNING: This is still experimental. You should have Fedora Silverblue 37 already installed:
@@ -44,5 +46,10 @@ As the Fedora Silverblue images update those changes will propogate to you via t
 
 ## FAQ
 
-I wanna run the first boot script again
+Should I use this?
+> Probably not. I'm still very much learning about how to make a "good" image,  
+> and with the amounts of small fixes I push because I forget to do something basic  
+> means I don't really recommend you use this unless you want to help out.
+
+I wanna run the first boot script again, how do I do it?
 > Open a terminal and run `hikami-firstboot`
