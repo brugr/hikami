@@ -1,137 +1,214 @@
 #!/bin/sh
 
-if test -e "$HOME"/.config/hikami/firstboot-done; then
-    echo "Already ran"
-    exit 0
-fi
-
-(
-echo "# Waiting for Internet connection"
-until /usr/bin/ping -q -c 1 flathub.org; do sleep 1; done
-echo "00"
-
-echo "# Removing Filtered Flathub Repository"
-/usr/bin/flatpak remote-delete flathub --force ||:
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Removing Filtered Flatpak Repo Failed"
-        exit 1
-fi
-echo "3"
-
-echo "# Enabling Flathub Repository"
-/usr/bin/flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Adding Flathub Repo Failed"
-        exit 1
-fi
-echo "5"
-
-echo "# Removing Fedora Flatpak Repository"
-/usr/bin/flatpak remote-delete fedora --force ||:
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Removing Fedora Flatpak Repo Failed"
-        exit 1
-fi
-echo "7"
-
-echo "# Installing LibreWolf"
-/usr/bin/flatpak install --user --noninteractive flathub io.gitlab.librewolf-community
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing LibreWolf Failed"
-        exit 1
-fi
-echo "15"
-
-echo "# Installing LibreOffice"
-/usr/bin/flatpak install --user --noninteractive flathub org.libreoffice.LibreOffice
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing LibreOffice Failed"
-        exit 1
-fi
-echo "30"
+# hikami-firstboot
+# Apart of hikami, a custom Silverblue image
+# https://github.com/brugr/hikami
+#
+# Licensed under Apache-2.0
+# https://github.com/brugr/hikami/blob/main/LICENSE
 
 
-echo "# Installing GNOME Applications"
-/usr/bin/flatpak install --user --noninteractive flathub \
-        org.gnome.Calculator \
-        org.gnome.Evince \
-        org.gnome.Logs 
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing GNOME Applications Failed"
-        exit 1
-fi
-echo "40"
+# Check if firstboot has been done (--check-already-ran)
+while [ -n "$1" ]
+    do
+        case "$1" in
+        --check-already-ran )
+            if test -e "$HOME"/.config/hikami/firstboot-done; then
+                echo "Already ran"
+                exit 0
+            fi;;
+        --help)
+            echo -e "Usage: hikami-firstboot [OPTION]...
 
-echo "# Installing more GNOME Applications"
-/usr/bin/flatpak install --user --noninteractive flathub \
-        org.gnome.NautilusPreviewer \
-        org.gnome.TextEditor \
-        org.gnome.Weather \
-        org.gnome.baobab \
-        org.gnome.eog \
-        org.gnome.FontManager
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing GNOME more Applications Failed"
-        exit 1
-fi
-echo "60"
+A simple script that runs on first boot and installs and configures a user's system.
 
-echo "# Installing Atoms"
-/usr/bin/flatpak install --user --noninteractive flathub pm.mirko.Atoms
-/usr/bin/flatpak override --user --talk-name=org.freedesktop.Flatpak pm.mirko.Atoms
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing Atoms Failed"
-        exit 1
-fi
-echo "70"
+Available options:
+  --help                shows this message
+  --check-already-ran   checks if the file \"\$HOME/.config/hikami/firstboot-done\"
+                        exists and if it does, the script won't run"; exit 0;;
 
-echo "# Installing Extension Manager"
-/usr/bin/flatpak install --user --noninteractive flathub com.mattjakeman.ExtensionManager
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing Extension Manager Failed"
-        exit 1
-fi
-echo "80"
+        *) echo "$1 is not an option, use \"--help\" to check available options"; exit 0;;
+        esac
+done
 
-echo "# Installing Flatseal"
-/usr/bin/flatpak install --user --noninteractive flathub com.github.tchx84.Flatseal
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing Flatseal Failed"
-        exit 1
-fi
-echo "90"
 
-echo "# Installing Celluloid Media Player"
-/usr/bin/flatpak install --user --noninteractive flathub io.github.celluloid_player.Celluloid
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Installing Celluloid Failed"
-        exit 1
-fi
-echo "100"
+# Info box
+zenity --info --title="Hikami First Boot" --width 400 \
+--text="This is the first boot wizard for Hikami.\n\n\
+It will add Flathub on your user and install some basic apps.\n\
+You'll be asked for your password in order to remove the stock Flatpak repos."
 
-echo "# Final small things"
-mkdir -p "$HOME"/.config/hikami/
-touch "$HOME"/.config/hikami/firstboot-done
+PASSWD="$(zenity --password)\n" # Password Box
 
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Firstboot Configuration Error"
-fi
-) |
-        zenity --progress --title="Hikami First Setup" --percentage=0 --auto-close --no-cancel --width=400
 
-if [ "$?" != 0 ] ; then
-        zenity --error \
-          --text="Firstboot Configuration Error"
-fi
+(   # Main array
+
+    echo "# Waiting for Internet connection"
+    until /usr/bin/ping -q -c 1 flathub.org; do sleep 1; done
+    echo "00"
+
+    echo "# Removing Filtered Flathub Repository"
+    echo -e $PASSWD | sudo -S flatpak remote-delete flathub --force ||:
+    if [ "$?" != 0 ]; then zenity --error --text="Removing Filtered Flatpak repo failed"; exit 1; fi
+    echo "3"
+
+    echo "# Removing Fedora Flatpak Repository"
+    echo -e $PASSWD | sudo -S flatpak remote-delete fedora --force ||:
+    if [ "$?" != 0 ]; then zenity --error --text="Removing Fedora Flatpak repo failed"; exit 1; fi
+    echo "5"
+
+    echo "# Enabling Flathub Repository"
+    flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    if [ "$?" != 0 ]; then zenity --error --text="Adding Flathub repo failed"; exit 1; fi
+    echo "7"
+
+    # Flatpak apps
+    if zenity --question --title="Install Flatpak apps?" --text="Do you want to install the recommended Flatpak apps? The apps being installed are:\n\n\
+Librewolf, ONLYOFFICE, Atoms (with Distrobox support enabled), Extension Manager, Flatseal and Celluloid Media Player"
+    then 
+        echo "# Installing LibreWolf"
+        flatpak install --user --noninteractive flathub io.gitlab.librewolf-community
+        if [ "$?" != 0 ]; then zenity --error --text="Installing LibreWolf failed"; exit 1; fi
+        echo "20"
+
+        echo "# Installing ONLYOFFICE"
+        flatpak install --user --noninteractive flathub org.onlyoffice.desktopeditors
+        if [ "$?" != 0 ]; then zenity --error --text="Installing ONLYOFFICE failed"; exit 1; fi
+        echo "30"
+
+        echo "# Installing Atoms"
+        flatpak install --user --noninteractive flathub pm.mirko.Atoms
+        if [ "$?" != 0 ]; then zenity --error --text="Installing Atoms failed"; exit 1; fi
+        echo "# Adding override for Atoms"
+        flatpak override --user --talk-name=org.freedesktop.Flatpak pm.mirko.Atoms
+        if [ "$?" != 0 ]; then zenity --error --text="Adding override for Atoms failed"; exit 1; fi
+        echo "# Make config folder for Atoms"
+        mkdir -p "$HOME/.var/app/pm.mirko.Atoms/config/glib-2.0/settings"
+        if [ "$?" != 0 ]; then zenity --error --text="Making config folder for Atoms failed"; exit 1; fi
+        echo "# Add config for Atoms"
+        echo -e "[pm/mirko/Atoms]\ndistrobox-integration=true" >> "$HOME/.var/app/pm.mirko.Atoms/config/glib-2.0/settings/keyfile"
+        if [ "$?" != 0 ]; then zenity --error --text="Adding config for Atoms failed"; exit 1; fi
+        echo "35"
+
+        echo "# Installing Extension Manager"
+        flatpak install --user --noninteractive flathub com.mattjakeman.ExtensionManager
+        if [ "$?" != 0 ]; then zenity --error --text="Installing Extension Manager failed"; exit 1; fi
+        echo "40"
+
+        echo "# Installing Flatseal"
+        flatpak install --user --noninteractive flathub com.github.tchx84.Flatseal
+        if [ "$?" != 0 ]; then zenity --error --text="Installing Flatseal failed"; exit 1; fi
+        echo "45"
+
+        echo "# Installing Celluloid Media Player"
+        flatpak install --user --noninteractive flathub io.github.celluloid_player.Celluloid
+        if [ "$?" != 0 ]; then zenity --error --text="Installing Celluloid failed"; exit 1; fi
+        echo "50"
+    else
+        echo "50"
+    fi
+
+    if zenity --question --title="Install GNOME apps?" --text="Do you want to install some basic GNOME apps? The apps being installed are:\n\n\
+Calculator, Document Viewer (Evince), Logs, Nautilus Previewer (Sushi), Text Editor, Weather, Disk Usage Analyzer (baobab), Image Viewer (eog), Font Manager and File Roller."
+    then
+        echo "# Installing GNOME Calculator"
+        flatpak install --user --noninteractive flathub org.gnome.Calculator
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Calculator failed"; exit 1; fi
+        echo "53"
+
+        echo "# Installing GNOME Document Viewer"
+        flatpak install --user --noninteractive flathub org.gnome.Evince
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Document Viewer failed"; exit 1; fi
+        echo "56"
+
+        echo "# Installing GNOME Logs"
+        flatpak install --user --noninteractive flathub org.gnome.Logs
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Logs failed"; exit 1; fi
+        echo "59"
+
+        echo "# Installing GNOME Nautilus Previewer"
+        flatpak install --user --noninteractive flathub org.gnome.NautilusPreviewer
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Nautilus Previewer failed"; exit 1; fi
+        echo "62"
+
+        echo "# Installing GNOME Text Editor"
+        flatpak install --user --noninteractive flathub org.gnome.TextEditor
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Text Editor failed"; exit 1; fi
+        echo "65"
+
+        echo "# Installing GNOME Weather"
+        flatpak install --user --noninteractive flathub org.gnome.Weather
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Weather failed"; exit 1; fi
+        echo "68"
+
+        echo "# Installing GNOME Disk Usage Analyzer"
+        flatpak install --user --noninteractive flathub org.gnome.baobab
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Disk Usage Analyzer failed"; exit 1; fi
+        echo "71"
+
+        echo "# Installing GNOME Image Viewer"
+        flatpak install --user --noninteractive flathub org.gnome.eog
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Image Viewer failed"; exit 1; fi
+        echo "74"
+
+        echo "# Installing GNOME Font Manager"
+        flatpak install --user --noninteractive flathub org.gnome.FontManager
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME Font Manager failed"; exit 1; fi
+        echo "77"
+
+        echo "# Installing GNOME File Roller"
+        flatpak install --user --noninteractive flathub org.gnome.FileRoller
+        if [ "$?" != 0 ]; then zenity --error --text="Installing GNOME File Roller failed"; exit 1; fi
+        echo "80"
+    else
+        echo "80"
+    fi
+
+    if zenity --question --title="Install GNOME apps?" --text="Do you want to install the recommended GNOME Shell Extensions? The ones being installed are:\n\n\
+Legacy (GTK3) Theme Scheme Auto Switcher, Tray Icons: Reloaded, Firefox PIP Always on Top, Bluetooth Quick Connect and Rounded Window Corners.\n\n\
+NOTE: There will be a popup for every extension asking you to install them, just keep pressing install."
+    then
+        echo "# Installing GNOME Extensions"
+        extensions=( https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
+        https://extensions.gnome.org/extension/2890/tray-icons-reloaded/
+        https://extensions.gnome.org/extension/5306/firefox-pip-always-on-top/
+        https://extensions.gnome.org/extension/1401/bluetooth-quick-connect/
+        https://extensions.gnome.org/extension/5237/rounded-window-corners/ )
+
+        for i in "${extensions[@]}"
+        do
+            EXTENSION_ID=$(curl -s $i | grep -oP 'data-uuid="\K[^"]+')
+            VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?search=$EXTENSION_ID" | jq '.extensions[0] | .shell_version_map | map(.pk) | max')
+            wget -O ${EXTENSION_ID}.zip "https://extensions.gnome.org/download-extension/${EXTENSION_ID}.shell-extension.zip?version_tag=$VERSION_TAG"
+            gnome-extensions install --force ${EXTENSION_ID}.zip
+            if ! gnome-extensions list | grep --quiet ${EXTENSION_ID}; then
+                busctl --user call org.gnome.Shell.Extensions /org/gnome/Shell/Extensions org.gnome.Shell.Extensions InstallRemoteExtension s ${EXTENSION_ID}
+            fi
+            gnome-extensions enable ${EXTENSION_ID}
+            rm ${EXTENSION_ID}.zip
+        done
+        echo "90"
+    else
+        echo "90"
+    fi
+
+    echo "# Final touches"
+    mkdir -p "$HOME"/.config/hikami/
+    touch "$HOME"/.config/hikami/firstboot-done
+    gnome-extensions disable background-logo@fedorahosted.org
+    flatpak install --user --noninteractive flathub org.gtk.Gtk3theme.adw-gtk3 org.gtk.Gtk3theme.adw-gtk3-dark
+    if [ "$?" != 0 ]; then zenity --error --text="Installing adw-gtk3 Flatpak failed"; exit 1; fi
+
+    if zenity --question --title="Select Color Scheme" --text="Do you want a light theme or a dark theme?" --ok-label="Dark Theme" --cancel-label="Light Theme"
+    then
+        gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark' && gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+        echo "100"
+    else
+        gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3' && gsettings set org.gnome.desktop.interface color-scheme 'default'
+        echo "100"
+    fi
+
+    
+) | zenity --title="Hikami First Boot" --progress --width=400 --auto-close --no-cancel --percentage=0
+
+if [ "$?" != 0 ]; then zenity --error --text="Firstboot script failed"; exit 1; fi

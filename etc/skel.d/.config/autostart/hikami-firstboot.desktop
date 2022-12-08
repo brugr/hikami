@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=hikami Desktop FirstBoot Setup
-Comment=Sets up hikami Desktop Correctly On FirstBoot
-Exec=/usr/bin/hikami-firstboot
+Name=Hikami First Boot Setup
+Comment=Runs hikami-firstboot with the --check-already-ran option
+Exec=/usr/bin/hikami-firstboot --check-already-ran
 Icon=org.gnome.Terminal
 Type=Application
 Categories=Utility;System;
