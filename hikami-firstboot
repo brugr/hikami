@@ -52,7 +52,7 @@ PASSWD="$(zenity --password)\n" # Password Box
 NOTE: This is HIGHLY recommended! Any Flatpak system apps that are kept won't get any updates!" --ok-label="Yes" --cancel-label="No (NOT RECOMMENDED)"
     then
         echo "# Removing system Flatpaks"
-        echo -e $PASSWD | sudo flatpak remove --system --all --verbose --noninteractive
+        echo -e $PASSWD | sudo -S flatpak remove --system --all --verbose --noninteractive
         if [ "$?" != 0 ]; then zenity --error --text="Removing system Flatpaks failed"; exit 1; fi
         mkdir -p "$HOME"/.config/hikami/
         touch "$HOME"/.config/hikami/system-apps-removed
