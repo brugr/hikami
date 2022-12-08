@@ -16,7 +16,7 @@ WARNING: This is still experimental. You should have Fedora Silverblue 37 alread
 ## Changes from stock Silverblue
 
 - Removes the following packages from the image
-  - Firefox (gets replaced with Librewolf Flatpak)
+  - Firefox (gets replaced with a Flatpak)
 - Adds the following packages to the image:
   - distrobox and gnome-tweaks
   - zsh
@@ -30,7 +30,7 @@ WARNING: This is still experimental. You should have Fedora Silverblue 37 alread
 
 #### Applications available in hikami-firstboot
 
-- LibreWolf, OnlyOffice, Extension Manager, Flatseal, Atoms and the Celluloid Media Player
+- Firefox, OnlyOffice, Extension Manager, Flatseal, Atoms and the Celluloid Media Player
 - Core GNOME Applications installed from Flathub
   - GNOME Calculator, Evince, Logs, Nautilus Previewer (Sushi), Text Editor, Weather, Disk Usage Analyzer (baobab), Image Viewer (eog), Font Manager and File Roller
 - All applications installed per user instead of system wide, similar to openSUSE MicroOS.

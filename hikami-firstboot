@@ -65,7 +65,7 @@ NOTE: This is HIGHLY recommended! Any Flatpak system apps that are kept won't ge
 
     echo "# Removing Filtered Flathub Repository"
     echo -e $PASSWD | sudo -S flatpak remote-delete flathub --force --verbose ||:
-    if [ "$?" != 0 ]; then zenity --error --text="Removing Filtered Flatpak repo failed"; exit 1; fi
+    if [ "$?" != 0 ]; then zenity --error --text="Removing Filtered Flathub repo failed"; exit 1; fi
     echo "3"
 
     echo "# Removing Fedora Flatpak Repository"
@@ -80,11 +80,11 @@ NOTE: This is HIGHLY recommended! Any Flatpak system apps that are kept won't ge
 
     # Flatpak apps
     if zenity --question --title="Install Flatpak apps?" --text="Do you want to install the recommended Flatpak apps? The apps being installed are:\n\n\
-Librewolf, ONLYOFFICE, Atoms (with Distrobox support enabled), Extension Manager, Flatseal and Celluloid Media Player"
+Firefox, ONLYOFFICE, Atoms (with Distrobox support enabled), Extension Manager, Flatseal and Celluloid Media Player"
     then 
-        echo "# Installing LibreWolf"
-        flatpak install --user --noninteractive --verbose flathub io.gitlab.librewolf-community
-        if [ "$?" != 0 ]; then zenity --error --text="Installing LibreWolf failed"; exit 1; fi
+        echo "# Installing Firefox"
+        flatpak install --user --noninteractive --verbose flathub org.mozilla.firefox
+        if [ "$?" != 0 ]; then zenity --error --text="Installing Firefox failed"; exit 1; fi
         echo "20"
 
         echo "# Installing ONLYOFFICE"
