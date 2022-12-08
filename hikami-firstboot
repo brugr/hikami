@@ -16,7 +16,8 @@ while [ -n "$1" ]
             if test -e "$HOME"/.config/hikami/firstboot-done; then
                 echo "Already ran"
                 exit 0
-            fi;;
+            fi
+            break;;
         --help)
             echo -e "Usage: hikami-firstboot [OPTION]...
 
